@@ -4,29 +4,27 @@
 
 ## 핵심
 
-Promise의 `resolve`를 `useRef`에 저장 → 사용자가 버튼 클릭 시 resolve 호출 → `await`으로 결과 수신
+Promise의 `resolve`를 `useRef`에 저장 → 사용자가 버튼 클릭 시 resolve 호출 → `await`으로 결과 수신.
+네이티브 `<dialog>`의 `showModal()`/`close()`를 사용하면 `isOpen` state 없이 ref만으로 동작.
 
 ```tsx
-// 이 패턴의 본질
-const confirmed = await confirm({ title: '삭제', message: '정말요?' })
+const confirmed = await confirm('정말 삭제하시겠습니까?')
 if (confirmed) await deleteItem(id)
 ```
 
 ## 구현
 
 ```tsx
-import { useCallback, useRef, useState } from 'react'
-
-type ConfirmOptions = { title: string; message: string }
+import { useCallback, useRef } from 'react'
 
 export function useConfirmDialog() {
-  const [isOpen, setIsOpen] = useState(false)
-  const [options, setOptions] = useState<ConfirmOptions>({ title: '', message: '' })
+  const dialogRef = useRef<HTMLDialogElement>(null)
   const resolveRef = useRef<(value: boolean) => void>()
+  const messageRef = useRef('')
 
-  const confirm = useCallback((opts: ConfirmOptions): Promise<boolean> => {
-    setOptions(opts)
-    setIsOpen(true)
+  const confirm = useCallback((message: string): Promise<boolean> => {
+    messageRef.current = message
+    dialogRef.current?.showModal()
     return new Promise((resolve) => {
       resolveRef.current = resolve
     })
@@ -34,27 +32,21 @@ export function useConfirmDialog() {
 
   const handleConfirm = useCallback(() => {
     resolveRef.current?.(true)
-    setIsOpen(false)
+    dialogRef.current?.close()
   }, [])
 
   const handleCancel = useCallback(() => {
     resolveRef.current?.(false)
-    setIsOpen(false)
+    dialogRef.current?.close()
   }, [])
 
-  const Dialog = useCallback(() => {
-    if (!isOpen) return null
-    return (
-      <div className="overlay">
-        <div role="alertdialog">
-          <h2>{options.title}</h2>
-          <p>{options.message}</p>
-          <button onClick={handleCancel}>취소</button>
-          <button onClick={handleConfirm}>확인</button>
-        </div>
-      </div>
-    )
-  }, [isOpen, options, handleConfirm, handleCancel])
+  const Dialog = useCallback(() => (
+    <dialog ref={dialogRef} onCancel={handleCancel}>
+      <p>{messageRef.current}</p>
+      <button onClick={handleCancel}>취소</button>
+      <button onClick={handleConfirm}>확인</button>
+    </dialog>
+  ), [handleConfirm, handleCancel])
 
   return { confirm, Dialog }
 }
@@ -67,11 +59,9 @@ function ItemList() {
   const { confirm, Dialog } = useConfirmDialog()
 
   const handleDelete = async (id: string) => {
-    const confirmed = await confirm({
-      title: '항목 삭제',
-      message: '정말 삭제하시겠습니까?',
-    })
-    if (confirmed) await deleteItem(id)
+    if (await confirm('정말 삭제하시겠습니까?')) {
+      await deleteItem(id)
+    }
   }
 
   return (
