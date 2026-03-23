@@ -28,7 +28,7 @@ Promise 방식:
 
 ## 단점 / 주의사항
 
-- 컴포넌트 트리에 Dialog를 렌더링할 위치 필요 (Portal 조합 권장)
+- 컴포넌트 트리에 Dialog 컴포넌트를 렌더링할 위치 필요
 - Promise가 resolve/reject 되지 않으면 메모리 누수 가능 → 언마운트 시 정리 필요
 - 여러 다이얼로그를 동시에 열어야 하는 경우 큐 관리가 복잡해질 수 있음
 
@@ -44,8 +44,7 @@ Promise 방식:
 ### 기본: useConfirmDialog 훅
 
 ```tsx
-import { useCallback, useRef, useState, ReactNode } from 'react'
-import { createPortal } from 'react-dom'
+import { useCallback, useRef, useState } from 'react'
 
 type ConfirmOptions = {
   title: string
@@ -80,10 +79,12 @@ export function useConfirmDialog() {
     setIsOpen(false)
   }, [])
 
+  // Portal 불필요 — UI 라이브러리(shadcn, Radix 등)가 내부에서 처리하거나,
+  // 네이티브 <dialog>의 showModal()이 자체적으로 top layer에 렌더링
   const ConfirmDialog = useCallback(() => {
     if (!isOpen) return null
 
-    return createPortal(
+    return (
       <div className="fixed inset-0 bg-black/50 flex items-center justify-center">
         <div role="alertdialog" aria-modal="true" className="bg-white rounded-lg p-6">
           <h2 className="text-lg font-bold">{options.title}</h2>
@@ -97,8 +98,7 @@ export function useConfirmDialog() {
             </button>
           </div>
         </div>
-      </div>,
-      document.body
+      </div>
     )
   }, [isOpen, options, handleConfirm, handleCancel])
 
@@ -164,7 +164,7 @@ function usePromptDialog() {
     const [input, setInput] = useState('')
     if (!isOpen) return null
 
-    return createPortal(
+    return (
       <div className="modal-overlay">
         <div role="dialog" aria-modal="true">
           <label>{label}</label>
@@ -176,8 +176,7 @@ function usePromptDialog() {
             확인
           </button>
         </div>
-      </div>,
-      document.body
+      </div>
     )
   }
 
