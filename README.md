@@ -66,6 +66,12 @@ React 앱 코드 안에서 컴포넌트가 렌더링을 제어하는 **29가지 
 | 28 | **External Store** | Zustand/Jotai/Redux 외부 스토어 | ★★★ 권장 | [상세](28-external-store.md) |
 | 29 | **State Machine** | 명시적 상태/전환 정의 (XState) | ★★☆ 상황적 | [상세](29-state-machine.md) |
 
+### G. 명령형 패턴
+
+| # | 패턴 | 핵심 | 권장도 | 문서 |
+|---|------|------|--------|------|
+| 30 | **Promise-based Dialog** | await으로 다이얼로그 결과를 기다리는 명령형 패턴 | ★★★ 권장 | [상세](30-promise-based-dialog.md) |
+
 ## Sources
 
 - [React Design Patterns: Complete Guide (2026)](https://www.turbodocx.com/blog/react-design-patterns)
