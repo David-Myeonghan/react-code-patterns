@@ -1,6 +1,6 @@
 # React Code Patterns
 
-React 앱 코드 안에서 컴포넌트가 렌더링을 제어하는 **29가지 패턴**을 정리한 종합 가이드입니다.
+React 앱 코드 안에서 컴포넌트가 렌더링을 제어하는 **30가지 패턴**을 정리한 종합 가이드입니다.
 각 패턴별 동작 원리, 구현 코드 예제, 언제 사용하고 언제 피해야 하는지를 다룹니다.
 
 > 서버 렌더링 전략(CSR/SSR/SSG/ISR/RSC/PPR 등)은 [react-rendering-patterns](https://github.com/David-Myeonghan/react-rendering-patterns)을 참고하세요.
